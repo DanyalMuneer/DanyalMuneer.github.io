@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Joker Vault</title>
+  <style>
+    body {
+      background: url("https://i.imgur.com/8Km9tLL.jpg");
+      background-size: cover;
+      color: #00ff99;
+      font-family: monospace;
+      text-align: center;
+      padding-top: 120px;
+    }
+    input {
+      padding: 10px;
+      background: black;
+      color: #00ff99;
+      border: 1px solid #00ff99;
+    }
+    button {
+      padding: 10px 20px;
+      background: #00ff99;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🃏 JOKER PRIVATE VAULT</h1>
+  <p>"If you are here without permission, you already lost."</p>
+
+  <input type="password" id="pass" placeholder="Enter password">
+  <br><br>
+  <button onclick="unlock()">UNLOCK</button>
+
+  <p id="msg"></p>
+
+  <script>
+    function unlock() {
+      let p = document.getElementById("pass").value;
+      if (p === "joker@cute") {
+        window.location.href = "https://drive.google.com/yourlink";
+      } else {
+        document.getElementById("msg").innerText = "❌ Access Denied";
+      }
+    }
+  </script>
+</body>
+</html>
