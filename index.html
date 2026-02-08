@@ -1,50 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Joker Vault</title>
-  <style>
-    body {
-      background: url("https://i.imgur.com/8Km9tLL.jpg");
-      background-size: cover;
-      color: #00ff99;
-      font-family: monospace;
-      text-align: center;
-      padding-top: 120px;
-    }
-    input {
-      padding: 10px;
-      background: black;
-      color: #00ff99;
-      border: 1px solid #00ff99;
-    }
-    button {
-      padding: 10px 20px;
-      background: #00ff99;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>JOKER // PRIVATE SERVER</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --neon:#00ff9c;
+    --bg:#050707;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at center, #0a1b16 0%, var(--bg) 60%),
+      url("https://i.imgur.com/8Km9tLL.jpg") center/cover no-repeat;
+    color:var(--neon);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .card{
+    width:min(420px, 92%);
+    background:rgba(0,0,0,.75);
+    border:1px solid rgba(0,255,156,.35);
+    border-radius:14px;
+    padding:28px 24px 30px;
+    box-shadow:0 0 40px rgba(0,255,156,.15);
+    text-align:center;
+  }
+  h1{margin:0 0 8px; letter-spacing:2px}
+  .sub{opacity:.85; font-size:13px; margin-bottom:18px}
+  .line{height:1px; background:linear-gradient(90deg,transparent,var(--neon),transparent); margin:14px 0 18px}
+  input{
+    width:100%;
+    padding:12px 14px;
+    margin:8px 0 10px;
+    background:#020504;
+    color:var(--neon);
+    border:1px solid rgba(0,255,156,.35);
+    border-radius:10px;
+    outline:none;
+  }
+  input::placeholder{color:#4bd8b0}
+  button{
+    width:100%;
+    padding:12px 14px;
+    margin-top:6px;
+    background:linear-gradient(135deg, #00ff9c, #0ad3ff);
+    border:none; border-radius:10px;
+    color:#00130c; font-weight:700; letter-spacing:1px;
+    cursor:pointer;
+  }
+  button:active{transform:translateY(1px)}
+  .msg{min-height:18px; margin-top:10px; font-size:13px}
+  .deny{color:#ff5f5f}
+  .ok{color:#7dffcf}
+  .hidden{display:none}
+  .footer{opacity:.55; font-size:11px; margin-top:16px}
+</style>
 </head>
-
 <body>
-  <h1>🃏 JOKER PRIVATE VAULT</h1>
-  <p>"If you are here without permission, you already lost."</p>
 
-  <input type="password" id="pass" placeholder="Enter password">
-  <br><br>
-  <button onclick="unlock()">UNLOCK</button>
+<div class="card">
+  <h1>🃏 JOKER SERVER</h1>
+  <div class="sub">Unauthorized access will be logged.</div>
+  <div class="line"></div>
 
-  <p id="msg"></p>
+  <!-- STEP 1 -->
+  <div id="step1">
+    <input type="password" id="password" placeholder="Enter access password">
+    <button onclick="checkPass()">AUTHENTICATE</button>
+    <div id="msg1" class="msg"></div>
+  </div>
 
-  <script>
-    function unlock() {
-      let p = document.getElementById("pass").value;
-      if (p === "joker@cute") {
-        window.location.href = "https://drive.google.com/yourlink";
-      } else {
-        document.getElementById("msg").innerText = "❌ Access Denied";
-      }
+  <!-- STEP 2 -->
+  <div id="step2" class="hidden">
+    <input type="text" id="answer" placeholder="What is your love name?">
+    <button onclick="checkAnswer()">VERIFY IDENTITY</button>
+    <div id="msg2" class="msg"></div>
+  </div>
+
+  <div class="footer">© Joker Vault • Encrypted Gateway</div>
+</div>
+
+<script>
+  // === CONFIG ===
+  const PASSWORD = "joker@cute";                 // <-- change
+  const CORRECT_ANSWER = "daniyal";               // case-insensitive
+  const DRIVE_LINK = "https://drive.google.com/yourlink"; // <-- change
+
+  function checkPass(){
+    const p = document.getElementById("password").value;
+    const m = document.getElementById("msg1");
+    if(p === PASSWORD){
+      m.innerHTML = "✔ Access granted. Secondary verification required.";
+      m.className = "msg ok";
+      document.getElementById("step1").classList.add("hidden");
+      document.getElementById("step2").classList.remove("hidden");
+    }else{
+      m.innerHTML = "❌ Access denied.";
+      m.className = "msg deny";
     }
-  </script>
+  }
+
+  function checkAnswer(){
+    const a = document.getElementById("answer").value.trim().toLowerCase();
+    const m = document.getElementById("msg2");
+    if(a === CORRECT_ANSWER){
+      m.innerHTML = "✔ Identity verified. Redirecting…";
+      m.className = "msg ok";
+      setTimeout(()=>{ window.location.href = DRIVE_LINK; }, 900);
+    }else{
+      m.innerHTML = "❌ Verification failed.";
+      m.className = "msg deny";
+    }
+  }
+</script>
+
 </body>
 </html>
