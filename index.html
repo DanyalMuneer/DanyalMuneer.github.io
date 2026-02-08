@@ -4,71 +4,93 @@
 <meta charset="UTF-8">
 <title>JOKER // PRIVATE SERVER</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-  :root{
-    --neon:#00ff9c;
-    --bg:#050707;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    min-height:100vh;
-    background:
-      radial-gradient(ellipse at center, #0a1b16 0%, var(--bg) 60%),
-      url("https://i.imgur.com/8Km9tLL.jpg") center/cover no-repeat;
-    color:var(--neon);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .card{
-    width:min(420px, 92%);
-    background:rgba(0,0,0,.75);
-    border:1px solid rgba(0,255,156,.35);
-    border-radius:14px;
-    padding:28px 24px 30px;
-    box-shadow:0 0 40px rgba(0,255,156,.15);
-    text-align:center;
-  }
-  h1{margin:0 0 8px; letter-spacing:2px}
-  .sub{opacity:.85; font-size:13px; margin-bottom:18px}
-  .line{height:1px; background:linear-gradient(90deg,transparent,var(--neon),transparent); margin:14px 0 18px}
-  input{
-    width:100%;
-    padding:12px 14px;
-    margin:8px 0 10px;
-    background:#020504;
-    color:var(--neon);
-    border:1px solid rgba(0,255,156,.35);
-    border-radius:10px;
-    outline:none;
-  }
-  input::placeholder{color:#4bd8b0}
-  button{
-    width:100%;
-    padding:12px 14px;
-    margin-top:6px;
-    background:linear-gradient(135deg, #00ff9c, #0ad3ff);
-    border:none; border-radius:10px;
-    color:#00130c; font-weight:700; letter-spacing:1px;
-    cursor:pointer;
-  }
-  button:active{transform:translateY(1px)}
-  .msg{min-height:18px; margin-top:10px; font-size:13px}
-  .deny{color:#ff5f5f}
-  .ok{color:#7dffcf}
-  .hidden{display:none}
-  .footer{opacity:.55; font-size:11px; margin-top:16px}
+:root{
+  --neon:#00ff9c;
+  --bg:#050707;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  height:100vh;
+  background:
+    radial-gradient(circle at center, #0a1b16 0%, var(--bg) 65%),
+    url("https://i.imgur.com/8Km9tLL.jpg") center/cover no-repeat;
+  color:var(--neon);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Card */
+.card{
+  width:min(420px,92%);
+  background:rgba(0,0,0,.8);
+  border:1px solid rgba(0,255,156,.4);
+  border-radius:14px;
+  padding:26px;
+  box-shadow:0 0 40px rgba(0,255,156,.2);
+}
+
+/* Terminal text */
+.terminal{
+  font-size:14px;
+  line-height:1.6;
+  min-height:70px;
+}
+.cursor{
+  display:inline-block;
+  width:8px;
+  background:var(--neon);
+  margin-left:4px;
+  animation:blink 1s infinite;
+}
+@keyframes blink{
+  0%,50%,100%{opacity:1}
+  25%,75%{opacity:0}
+}
+
+/* Inputs */
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  background:#020504;
+  color:var(--neon);
+  border:1px solid rgba(0,255,156,.35);
+  border-radius:10px;
+  outline:none;
+}
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  background:linear-gradient(135deg,#00ff9c,#0ad3ff);
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.msg{margin-top:8px;font-size:13px}
+.deny{color:#ff5f5f}
+.ok{color:#7dffcf}
+.hidden{display:none}
+.footer{margin-top:14px;font-size:11px;opacity:.6;text-align:center}
 </style>
 </head>
+
 <body>
 
 <div class="card">
-  <h1>🃏 JOKER SERVER</h1>
-  <div class="sub">Unauthorized access will be logged.</div>
-  <div class="line"></div>
+  <div class="terminal">
+    <span id="typed"></span><span class="cursor"></span>
+  </div>
 
   <!-- STEP 1 -->
-  <div id="step1">
+  <div id="step1" class="hidden">
     <input type="password" id="password" placeholder="Enter access password">
     <button onclick="checkPass()">AUTHENTICATE</button>
     <div id="msg1" class="msg"></div>
@@ -76,7 +98,14 @@
 
   <!-- STEP 2 -->
   <div id="step2" class="hidden">
-    <input type="text" id="answer" placeholder="What is your love name?">
+    <input type="text"
+      id="answer"
+      name="field_x9a2"
+      autocomplete="new-password"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      placeholder="Identify the one who bypassed my firewall.">
     <button onclick="checkAnswer()">VERIFY IDENTITY</button>
     <div id="msg2" class="msg"></div>
   </div>
@@ -84,39 +113,83 @@
   <div class="footer">© Joker Vault • Encrypted Gateway</div>
 </div>
 
+<!-- Joker laugh sound -->
+<audio id="laugh">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-evil-laugh-429.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-  // === CONFIG ===
-  const PASSWORD = "joker@cute";                 // <-- change
-  const CORRECT_ANSWER = "daniyal";               // case-insensitive
-  const DRIVE_LINK = "https://drive.google.com/yourlink"; // <-- change
+/* ========= CONFIG ========= */
+const PASSWORD = "joker@cute";          // change if needed
+const CORRECT_ANSWER = "daniyal";        // case-insensitive
+const DRIVE_LINK = "https://drive.google.com/yourlink";
 
-  function checkPass(){
-    const p = document.getElementById("password").value;
-    const m = document.getElementById("msg1");
-    if(p === PASSWORD){
-      m.innerHTML = "✔ Access granted. Secondary verification required.";
-      m.className = "msg ok";
-      document.getElementById("step1").classList.add("hidden");
-      document.getElementById("step2").classList.remove("hidden");
-    }else{
-      m.innerHTML = "❌ Access denied.";
-      m.className = "msg deny";
-    }
-  }
+/* ========= TYPING TEXT ========= */
+const text = [
+  "Connecting to Joker Private Server...",
+  "Bypassing public firewall...",
+  "Access level: RESTRICTED",
+  "Unauthorized access will be logged."
+];
 
-  function checkAnswer(){
-    const a = document.getElementById("answer").value.trim().toLowerCase();
-    const m = document.getElementById("msg2");
-    if(a === CORRECT_ANSWER){
-      m.innerHTML = "✔ Identity verified. Redirecting…";
-      m.className = "msg ok";
-      setTimeout(()=>{ window.location.href = DRIVE_LINK; }, 900);
+let line = 0, char = 0;
+const typed = document.getElementById("typed");
+
+function typeEffect(){
+  if(line < text.length){
+    if(char < text[line].length){
+      typed.innerHTML += text[line].charAt(char);
+      char++;
+      setTimeout(typeEffect, 40);
     }else{
-      m.innerHTML = "❌ Verification failed.";
-      m.className = "msg deny";
+      typed.innerHTML += "<br>";
+      char = 0;
+      line++;
+      setTimeout(typeEffect, 400);
     }
+  }else{
+    document.getElementById("step1").classList.remove("hidden");
   }
+}
+typeEffect();
+
+/* ========= LOGIC ========= */
+function laugh(){
+  const l = document.getElementById("laugh");
+  l.currentTime = 0;
+  l.play();
+}
+
+function checkPass(){
+  const p = document.getElementById("password").value;
+  const m = document.getElementById("msg1");
+  if(p === PASSWORD){
+    m.textContent = "✔ Access granted. Secondary verification required.";
+    m.className="msg ok";
+    document.getElementById("step1").classList.add("hidden");
+    document.getElementById("step2").classList.remove("hidden");
+  }else{
+    m.textContent = "❌ Access denied.";
+    m.className="msg deny";
+    laugh();
+  }
+}
+
+function checkAnswer(){
+  const a = document.getElementById("answer").value.trim().toLowerCase();
+  const m = document.getElementById("msg2");
+  if(a === CORRECT_ANSWER){
+    m.textContent = "✔ Identity verified. Redirecting…";
+    m.className="msg ok";
+    setTimeout(()=>window.location.href = DRIVE_LINK, 900);
+  }else{
+    m.textContent = "❌ Verification failed.";
+    m.className="msg deny";
+    laugh();
+  }
+}
 </script>
 
 </body>
 </html>
+
