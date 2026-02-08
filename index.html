@@ -9,8 +9,10 @@
 :root{
   --neon:#00ff9c;
   --bg:#050707;
+  --danger:#ff2a2a;
 }
 *{box-sizing:border-box}
+
 body{
   margin:0;
   height:100vh;
@@ -24,19 +26,22 @@ body{
   justify-content:center;
 }
 
+/* ===== CARD ===== */
 .card{
   width:min(420px,92%);
-  background:rgba(0,0,0,.82);
+  background:rgba(0,0,0,.85);
   border:1px solid rgba(0,255,156,.4);
   border-radius:14px;
   padding:26px;
   box-shadow:0 0 40px rgba(0,255,156,.25);
+  transition:0.2s;
 }
 
+/* ===== TERMINAL ===== */
 .terminal{
   font-size:14px;
   line-height:1.6;
-  min-height:80px;
+  min-height:90px;
 }
 
 .cursor{
@@ -46,12 +51,12 @@ body{
   margin-left:4px;
   animation:blink 1s infinite;
 }
-
 @keyframes blink{
   0%,50%,100%{opacity:1}
   25%,75%{opacity:0}
 }
 
+/* ===== INPUTS ===== */
 input{
   width:100%;
   padding:12px;
@@ -75,16 +80,40 @@ button{
 }
 
 .msg{margin-top:8px;font-size:13px}
-.deny{color:#ff5f5f}
 .ok{color:#7dffcf}
+.deny{color:var(--danger)}
 .hidden{display:none}
 .footer{margin-top:14px;font-size:11px;opacity:.6;text-align:center}
+
+/* ===== GLITCH EFFECT ===== */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-3px, 3px); }
+  40% { transform: translate(3px, -3px); }
+  60% { transform: translate(-3px, -3px); }
+  80% { transform: translate(3px, 3px); }
+  100% { transform: translate(0); }
+}
+.glitch{
+  animation:glitch 0.35s linear 3;
+  box-shadow:0 0 25px var(--danger);
+  border-color:var(--danger);
+}
+
+/* ===== RED FLASH ===== */
+.flash{
+  animation:flash 0.4s;
+}
+@keyframes flash{
+  0%{background:rgba(255,0,0,0.2)}
+  100%{background:rgba(0,0,0,.85)}
+}
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="card" id="card">
 
   <div class="terminal">
     <span id="typed"></span><span class="cursor"></span>
@@ -114,55 +143,31 @@ button{
   <div class="footer">© Joker Vault • Encrypted Gateway</div>
 </div>
 
-<!-- ONLINE JOKER LAUGH (NO FILE NEEDED) -->
-<audio id="laugh" preload="auto">
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-evil-laugh-429.mp3" type="audio/mpeg">
-</audio>
-
 <script>
-/* ========= CONFIG ========= */
-const PASSWORD = "joker@cute";      // change if you want
-const CORRECT_ANSWER = "daniyal";    // case-insensitive
+/* ===== CONFIG ===== */
+const PASSWORD = "joker@cute";
+const CORRECT_ANSWER = "daniyal";
 const DRIVE_LINK = "https://drive.google.com/yourlink";
 
-/* ========= AUDIO UNLOCK FIX ========= */
-/* Browser needs ONE user interaction to allow sound */
-document.addEventListener("click", () => {
-  const l = document.getElementById("laugh");
-  l.play().then(()=>{
-    l.pause();
-    l.currentTime = 0;
-  }).catch(()=>{});
-}, { once:true });
-
-function laugh(){
-  const l = document.getElementById("laugh");
-  l.currentTime = 0;
-  l.play();
-}
-
-/* ========= TYPING ANIMATION ========= */
+/* ===== TYPING EFFECT ===== */
 const text = [
   "Connecting to Joker Private Server...",
-  "Establishing encrypted channel...",
-  "Firewall status: ACTIVE",
+  "Initializing encrypted tunnel...",
+  "Firewall: ACTIVE",
   "Unauthorized access will be punished."
 ];
-
-let line = 0, char = 0;
-const typed = document.getElementById("typed");
+let line=0, char=0;
+const typed=document.getElementById("typed");
 
 function typeEffect(){
   if(line < text.length){
     if(char < text[line].length){
-      typed.innerHTML += text[line].charAt(char);
-      char++;
-      setTimeout(typeEffect, 40);
+      typed.innerHTML += text[line][char++];
+      setTimeout(typeEffect,40);
     }else{
       typed.innerHTML += "<br>";
-      char = 0;
-      line++;
-      setTimeout(typeEffect, 400);
+      char=0; line++;
+      setTimeout(typeEffect,400);
     }
   }else{
     document.getElementById("step1").classList.remove("hidden");
@@ -170,40 +175,52 @@ function typeEffect(){
 }
 typeEffect();
 
-/* ========= LOGIC ========= */
-function checkPass(){
-  const p = document.getElementById("password").value;
-  const m = document.getElementById("msg1");
+/* ===== DENY EFFECT ===== */
+function denyEffect(){
+  const card=document.getElementById("card");
+  card.classList.add("glitch","flash");
 
-  if(p === PASSWORD){
-    m.textContent = "✔ Access granted. Secondary verification required.";
-    m.className = "msg ok";
+  if(navigator.vibrate){
+    navigator.vibrate([200,100,200,100,300]);
+  }
+
+  setTimeout(()=>{
+    card.classList.remove("glitch","flash");
+  },900);
+}
+
+/* ===== LOGIC ===== */
+function checkPass(){
+  const p=document.getElementById("password").value;
+  const m=document.getElementById("msg1");
+
+  if(p===PASSWORD){
+    m.textContent="✔ Access granted. Secondary verification required.";
+    m.className="msg ok";
     document.getElementById("step1").classList.add("hidden");
     document.getElementById("step2").classList.remove("hidden");
   }else{
-    m.textContent = "❌ Access denied.";
-    m.className = "msg deny";
-    laugh();
+    m.textContent="❌ Access denied.";
+    m.className="msg deny";
+    denyEffect();
   }
 }
 
 function checkAnswer(){
-  const a = document.getElementById("answer").value.trim().toLowerCase();
-  const m = document.getElementById("msg2");
+  const a=document.getElementById("answer").value.trim().toLowerCase();
+  const m=document.getElementById("msg2");
 
-  if(a === CORRECT_ANSWER){
-    m.textContent = "✔ Identity verified. Redirecting…";
-    m.className = "msg ok";
-    setTimeout(()=>window.location.href = DRIVE_LINK, 900);
+  if(a===CORRECT_ANSWER){
+    m.textContent="✔ Identity verified. Redirecting…";
+    m.className="msg ok";
+    setTimeout(()=>window.location.href=DRIVE_LINK,900);
   }else{
-    m.textContent = "❌ Verification failed.";
-    m.className = "msg deny";
-    laugh();
+    m.textContent="❌ Verification failed.";
+    m.className="msg deny";
+    denyEffect();
   }
 }
 </script>
 
 </body>
 </html>
-
-
