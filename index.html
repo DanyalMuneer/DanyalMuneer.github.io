@@ -24,22 +24,21 @@ body{
   justify-content:center;
 }
 
-/* Card */
 .card{
   width:min(420px,92%);
-  background:rgba(0,0,0,.8);
+  background:rgba(0,0,0,.82);
   border:1px solid rgba(0,255,156,.4);
   border-radius:14px;
   padding:26px;
-  box-shadow:0 0 40px rgba(0,255,156,.2);
+  box-shadow:0 0 40px rgba(0,255,156,.25);
 }
 
-/* Terminal text */
 .terminal{
   font-size:14px;
   line-height:1.6;
-  min-height:70px;
+  min-height:80px;
 }
+
 .cursor{
   display:inline-block;
   width:8px;
@@ -47,12 +46,12 @@ body{
   margin-left:4px;
   animation:blink 1s infinite;
 }
+
 @keyframes blink{
   0%,50%,100%{opacity:1}
   25%,75%{opacity:0}
 }
 
-/* Inputs */
 input{
   width:100%;
   padding:12px;
@@ -63,6 +62,7 @@ input{
   border-radius:10px;
   outline:none;
 }
+
 button{
   width:100%;
   padding:12px;
@@ -85,6 +85,7 @@ button{
 <body>
 
 <div class="card">
+
   <div class="terminal">
     <span id="typed"></span><span class="cursor"></span>
   </div>
@@ -113,23 +114,39 @@ button{
   <div class="footer">© Joker Vault • Encrypted Gateway</div>
 </div>
 
-<!-- Joker laugh sound -->
-<audio id="laugh">
+<!-- ONLINE JOKER LAUGH (NO FILE NEEDED) -->
+<audio id="laugh" preload="auto">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-evil-laugh-429.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 /* ========= CONFIG ========= */
-const PASSWORD = "joker@cute";          // change if needed
-const CORRECT_ANSWER = "daniyal";        // case-insensitive
+const PASSWORD = "joker@cute";      // change if you want
+const CORRECT_ANSWER = "daniyal";    // case-insensitive
 const DRIVE_LINK = "https://drive.google.com/yourlink";
 
-/* ========= TYPING TEXT ========= */
+/* ========= AUDIO UNLOCK FIX ========= */
+/* Browser needs ONE user interaction to allow sound */
+document.addEventListener("click", () => {
+  const l = document.getElementById("laugh");
+  l.play().then(()=>{
+    l.pause();
+    l.currentTime = 0;
+  }).catch(()=>{});
+}, { once:true });
+
+function laugh(){
+  const l = document.getElementById("laugh");
+  l.currentTime = 0;
+  l.play();
+}
+
+/* ========= TYPING ANIMATION ========= */
 const text = [
   "Connecting to Joker Private Server...",
-  "Bypassing public firewall...",
-  "Access level: RESTRICTED",
-  "Unauthorized access will be logged."
+  "Establishing encrypted channel...",
+  "Firewall status: ACTIVE",
+  "Unauthorized access will be punished."
 ];
 
 let line = 0, char = 0;
@@ -154,23 +171,18 @@ function typeEffect(){
 typeEffect();
 
 /* ========= LOGIC ========= */
-function laugh(){
-  const l = document.getElementById("laugh");
-  l.currentTime = 0;
-  l.play();
-}
-
 function checkPass(){
   const p = document.getElementById("password").value;
   const m = document.getElementById("msg1");
+
   if(p === PASSWORD){
     m.textContent = "✔ Access granted. Secondary verification required.";
-    m.className="msg ok";
+    m.className = "msg ok";
     document.getElementById("step1").classList.add("hidden");
     document.getElementById("step2").classList.remove("hidden");
   }else{
     m.textContent = "❌ Access denied.";
-    m.className="msg deny";
+    m.className = "msg deny";
     laugh();
   }
 }
@@ -178,13 +190,14 @@ function checkPass(){
 function checkAnswer(){
   const a = document.getElementById("answer").value.trim().toLowerCase();
   const m = document.getElementById("msg2");
+
   if(a === CORRECT_ANSWER){
     m.textContent = "✔ Identity verified. Redirecting…";
-    m.className="msg ok";
+    m.className = "msg ok";
     setTimeout(()=>window.location.href = DRIVE_LINK, 900);
   }else{
     m.textContent = "❌ Verification failed.";
-    m.className="msg deny";
+    m.className = "msg deny";
     laugh();
   }
 }
@@ -192,4 +205,5 @@ function checkAnswer(){
 
 </body>
 </html>
+
 
